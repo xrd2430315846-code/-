@@ -1,0 +1,12 @@
+# Windows 系统垃圾
+Thumbs.db
+Desktop.ini
+~$*
+
+# 临时/日志
+*.log
+*.tmp
+
+# 编辑器
+.vscode/
+.idea/
