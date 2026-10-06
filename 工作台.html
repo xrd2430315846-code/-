@@ -237,6 +237,54 @@ main{max-width:980px;margin:0 auto;padding:14px 16px 60px;}
   main{padding:12px 10px 60px;}
   .tabs{padding:8px 10px 0;}
 }
+/* ============ 记账 ============ */
+.lhead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.lhead h2{margin:0;}
+.lnav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;}
+.lsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.lbox{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+.lbox .lb{font-size:12.5px;color:var(--muted);margin-bottom:2px;}
+.lbox .lv{font-size:21px;font-weight:600;font-variant-numeric:tabular-nums;word-break:break-all;}
+.lv.in{color:var(--ok);}
+.lv.out{color:var(--danger);}
+.lv.bal.neg{color:var(--danger);}
+.ladd{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.ladd input[type="number"]{width:112px;}
+.ladd #ledCat{flex:1;min-width:130px;}
+.ladd input[type="date"]{width:auto;}
+.bud{margin-bottom:12px;}
+.bud .bt{display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:5px;}
+.bud .bt .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bud .bt .amt{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;flex:none;}
+.bud.over .bt .amt{color:var(--danger);}
+.bud .bar i.over{background:var(--danger);}
+.lrow{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--border);}
+.lrow:last-child{border-bottom:none;}
+.lrow .ldate{flex:none;font-size:12.5px;color:var(--muted);width:46px;}
+.lrow .lcat{flex:none;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lrow .lacct{flex:none;font-size:12.5px;color:var(--muted);}
+.lrow .lnote{flex:1;min-width:0;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lrow .lamt{flex:none;font-weight:600;font-variant-numeric:tabular-nums;}
+.lrow .lamt.in{color:var(--ok);}
+.lrow .lamt.out{color:var(--danger);}
+.catlist{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.cattag{display:inline-flex;align-items:center;gap:4px;font-size:13px;padding:3px 6px 3px 12px;border:1px solid var(--border);border-radius:99px;background:var(--bg);}
+.cattag .nm{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cattag button{border:none;background:transparent;color:var(--muted);padding:3px 5px;border-radius:6px;font-size:12px;}
+.cattag button:hover{background:var(--accent-weak);color:var(--accent);}
+.grp{margin-bottom:18px;}
+.grp h3{margin:0 0 8px;font-size:14px;}
+.setrow{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.setrow input[type="text"]{flex:1;min-width:120px;}
+.setrow input[type="number"]{width:112px;}
+.setrow .nm{flex:1;min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#cardLedger{grid-column:1 / -1;}
+@media (max-width:520px){
+  .lsum{gap:8px;}
+  .lbox{padding:10px;}
+  .lbox .lv{font-size:17px;}
+  .ladd input[type="number"]{width:94px;}
+}
 </style>
 </head>
 <body>
@@ -279,6 +327,9 @@ main{max-width:980px;margin:0 auto;padding:14px 16px 60px;}
   <button class="tab" data-tab="journal">
     <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg>日志
   </button>
+  <button class="tab" data-tab="ledger">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><path d="M16.5 15h2"/></svg>记账
+  </button>
 </nav>
 
 <main>
@@ -310,6 +361,17 @@ main{max-width:980px;margin:0 auto;padding:14px 16px 60px;}
         <div class="mweek"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
         <div id="monthGrid" class="mgrid"></div>
         <div class="mlegend">圆点 = 当天写了日志 · 数字 = 当天还没做完的待办 · 点格子看当天详情</div>
+      </div>
+      <div class="card" id="cardLedger">
+        <div class="lhead">
+          <h2>本月结余</h2>
+          <div class="lnav"><button id="btnLedGo" class="ghost sm">去记账</button></div>
+        </div>
+        <div class="lsum" style="margin-bottom:0;">
+          <div class="lbox"><div class="lb">收入合计</div><div class="lv in" id="homeLedIn">¥0.00</div></div>
+          <div class="lbox"><div class="lb">支出合计</div><div class="lv out" id="homeLedOut">¥0.00</div></div>
+          <div class="lbox"><div class="lb">结余</div><div class="lv bal" id="homeLedBal">¥0.00</div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -387,6 +449,47 @@ main{max-width:980px;margin:0 auto;padding:14px 16px 60px;}
       <div id="journalHistory"></div>
     </div>
   </section>
+
+  <!-- 记账 -->
+  <section class="page" id="page-ledger">
+    <div class="card">
+      <div class="lhead">
+        <h2 id="ledMonth"></h2>
+        <div class="lnav">
+          <button id="ledPrev" class="ghost sm" title="上一个月">上一月</button>
+          <button id="ledThis" class="ghost sm">本月</button>
+          <button id="ledNext" class="ghost sm" title="下一个月">下一月</button>
+          <button id="btnLedSet" class="ghost sm" title="管理分类、账户与每月预算">分类与预算</button>
+        </div>
+      </div>
+      <div class="lsum">
+        <div class="lbox"><div class="lb">收入合计</div><div class="lv in" id="ledIn">¥0.00</div></div>
+        <div class="lbox"><div class="lb">支出合计</div><div class="lv out" id="ledOut">¥0.00</div></div>
+        <div class="lbox"><div class="lb">结余</div><div class="lv bal" id="ledBal">¥0.00</div></div>
+      </div>
+      <div class="ladd">
+        <select id="ledType" title="收入还是支出">
+          <option value="expense">支出</option>
+          <option value="income">收入</option>
+        </select>
+        <input type="number" id="ledAmount" step="0.01" min="0" placeholder="金额" title="金额（元）">
+        <input type="text" id="ledCat" list="ledCatList" placeholder="分类，可新建" maxlength="20" title="没写过的名字回车即新建分类">
+        <datalist id="ledCatList"></datalist>
+        <select id="ledAccount" title="账户（可不填）"></select>
+        <input type="date" id="ledDate" title="日期，可改成过去某天补记">
+        <input type="text" id="ledNote" placeholder="备注（可空）" maxlength="60">
+        <button id="btnLedAdd" class="primary">记下</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>本月分类预算</h2>
+      <div id="ledBudgets"></div>
+    </div>
+    <div class="card">
+      <h2>本月明细</h2>
+      <div id="ledList"></div>
+    </div>
+  </section>
 </main>
 
 <!-- 横幅提醒容器 -->
@@ -420,6 +523,45 @@ main{max-width:980px;margin:0 auto;padding:14px 16px 60px;}
       <button id="btnDayAdd" class="primary" title="添加到这天"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>添加</button>
     </div>
     <div id="dayBody"></div>
+  </div>
+</div>
+
+<!-- 分类与预算弹窗 -->
+<div class="overlay" id="ledSetModal" hidden>
+  <div class="modal">
+    <div class="modhead">
+      <h2>分类与预算</h2>
+      <button class="x" data-close="ledSetModal" title="关闭"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="grp">
+      <h3>支出分类</h3>
+      <div class="catlist" id="catExpense"></div>
+      <div class="setrow">
+        <input type="text" id="newCatExpense" placeholder="新支出分类，回车即加" maxlength="20">
+        <button class="ghost sm" id="btnCatExpense">加分类</button>
+      </div>
+    </div>
+    <div class="grp">
+      <h3>收入分类</h3>
+      <div class="catlist" id="catIncome"></div>
+      <div class="setrow">
+        <input type="text" id="newCatIncome" placeholder="新收入分类，回车即加" maxlength="20">
+        <button class="ghost sm" id="btnCatIncome">加分类</button>
+      </div>
+    </div>
+    <div class="grp">
+      <h3>账户（记的时候可以不填）</h3>
+      <div class="catlist" id="acctList"></div>
+      <div class="setrow">
+        <input type="text" id="newAcct" placeholder="新账户，如 微信" maxlength="20">
+        <button class="ghost sm" id="btnAcct">加账户</button>
+      </div>
+    </div>
+    <div class="grp">
+      <h3>每月预算</h3>
+      <p class="muted" style="margin:0 0 10px;">给支出分类设一个月度上限，例如 吃饭 800。留空 = 不限。</p>
+      <div id="budgetList"></div>
+    </div>
   </div>
 </div>
 
@@ -485,8 +627,18 @@ function icon(name){
 /* ================= 数据 ================= */
 var KEY="workbench.v1";
 var storageOK=true;
+function emptyLedger(){return {entries:[],cats:{expense:[],income:[]},accounts:[],budgets:{}};}
 function defaults(){
-  return {version:1,todos:[],projects:[],notes:[],journal:{},settings:{theme:"auto"}};
+  return {version:2,todos:[],projects:[],notes:[],journal:{},ledger:emptyLedger(),settings:{theme:"auto"}};
+}
+function strList(a){
+  if(!Array.isArray(a))return [];
+  var seen={},out=[];
+  for(var i=0;i<a.length;i++){
+    var s=String(a[i]==null?"":a[i]).trim();
+    if(s&&!seen[s]){seen[s]=1;out.push(s);}
+  }
+  return out;
 }
 function sanitize(o){
   if(!o||typeof o!=="object"||Array.isArray(o))return null;
@@ -507,6 +659,31 @@ function sanitize(o){
     var e=o.journal[k];
     if(e&&typeof e==="object"&&!Array.isArray(e)){
       d.journal[k]={mood:(+e.mood||0),text:String(e.text||""),updatedAt:String(e.updatedAt||"")};
+    }
+  }
+  /* 记账：金额一律存整数「分」，避免小数相加出现误差 */
+  var L=(o.ledger&&typeof o.ledger==="object"&&!Array.isArray(o.ledger))?o.ledger:null;
+  if(L){
+    d.ledger.entries=(Array.isArray(L.entries)?L.entries:[]).filter(function(e){
+      return e&&typeof e==="object"&&(e.type==="income"||e.type==="expense")&&typeof e.cat==="string"&&e.cat;
+    }).map(function(e){
+      var amt=Math.round(+e.amount);
+      if(!isFinite(amt)||amt<0)amt=0;
+      var ds=String(e.date||"");
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))ds=todayStr();
+      return{id:String(e.id||uid()),type:e.type,amount:amt,cat:String(e.cat),
+        account:String(e.account||""),note:String(e.note||""),date:ds,createdAt:String(e.createdAt||"")};
+    });
+    if(L.cats&&typeof L.cats==="object"){
+      d.ledger.cats.expense=strList(L.cats.expense);
+      d.ledger.cats.income=strList(L.cats.income);
+    }
+    d.ledger.accounts=strList(L.accounts);
+    if(L.budgets&&typeof L.budgets==="object"&&!Array.isArray(L.budgets)){
+      for(var bk in L.budgets){
+        var bv=Math.round(+L.budgets[bk]);
+        if(bk&&isFinite(bv)&&bv>0)d.ledger.budgets[bk]=bv;
+      }
     }
   }
   if(o.settings&&typeof o.settings==="object"&&["auto","light","dark"].indexOf(o.settings.theme)>=0){
@@ -794,6 +971,320 @@ function jumpJournal(ds){
   renderJournal();
 }
 
+/* ================= 记账 ================= */
+var ledCursor=new Date();
+var ledEditingId=null;
+function ledMonthKey(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1);}
+function fmtMoney(cents){
+  var neg=(+cents)<0;
+  var s=(Math.abs(+cents||0)/100).toFixed(2).split(".");
+  s[0]=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");
+  return (neg?"-":"")+s[0]+"."+s[1];
+}
+function ledEntriesOf(ym){
+  return state.ledger.entries.filter(function(e){return String(e.date).slice(0,7)===ym;});
+}
+function ledByCat(ym,type){
+  var m={};
+  ledEntriesOf(ym).forEach(function(e){
+    if(e.type!==type)return;
+    m[e.cat]=(m[e.cat]||0)+e.amount;
+  });
+  return m;
+}
+function ledStats(ym){
+  var inc=0,exp=0;
+  ledEntriesOf(ym).forEach(function(e){
+    if(e.type==="income")inc+=e.amount;else exp+=e.amount;
+  });
+  return{income:inc,expense:exp,balance:inc-exp};
+}
+function ledBudget(cat){
+  var b=state.ledger.budgets[cat];
+  return (typeof b==="number"&&b>0)?b:0;
+}
+function ledFind(id){
+  for(var i=0;i<state.ledger.entries.length;i++){if(state.ledger.entries[i].id===id)return state.ledger.entries[i];}
+  return null;
+}
+function ensureCat(type,name){
+  var arr=state.ledger.cats[type];
+  if(arr.indexOf(name)<0)arr.push(name);
+}
+function fillCatList(){
+  var dl=$("#ledCatList");
+  if(!dl)return;
+  var t=($("#ledType")&&$("#ledType").value==="income")?"income":"expense";
+  dl.innerHTML=(state.ledger.cats[t]||[]).map(function(c){return '<option value="'+esc(c)+'"></option>';}).join("");
+}
+function buildAccountOptions(){
+  var sel=$("#ledAccount");
+  if(!sel)return;
+  var cur=sel.value;
+  sel.innerHTML='<option value="">不填账户</option>'+state.ledger.accounts.map(function(a){
+    return '<option value="'+esc(a)+'">'+esc(a)+'</option>';
+  }).join("");
+  sel.value=state.ledger.accounts.indexOf(cur)>=0?cur:"";
+}
+function ledRow(e){
+  var md=String(e.date).slice(5);
+  return '<div class="lrow" data-id="'+esc(e.id)+'">'
+    +'<span class="ldate">'+esc(md)+'</span>'
+    +'<span class="lcat">'+esc(e.cat)+'</span>'
+    +(e.account?'<span class="lacct">'+esc(e.account)+'</span>':"")
+    +'<span class="lnote">'+esc(e.note||"")+'</span>'
+    +'<span class="lamt '+(e.type==="income"?"in":"out")+'">'+(e.type==="income"?"+":"-")+fmtMoney(e.amount)+'</span>'
+    +'<button class="ib" data-act="ledEdit" title="改这一笔">'+icon("pencil")+'</button>'
+    +'<button class="ib" data-act="ledDel" title="删除这一笔">'+icon("trash")+'</button>'
+    +'</div>';
+}
+function ledTypeOptions(sel){
+  return '<option value="expense"'+(sel==="expense"?" selected":"")+'>支出</option>'
+    +'<option value="income"'+(sel==="income"?" selected":"")+'>收入</option>';
+}
+function ledAcctOptions(sel){
+  return '<option value="">不填账户</option>'+state.ledger.accounts.map(function(a){
+    return '<option value="'+esc(a)+'"'+(a===sel?" selected":"")+'>'+esc(a)+'</option>';
+  }).join("");
+}
+function ledEditRow(e){
+  return '<div class="lrow" data-id="'+esc(e.id)+'"><div class="erow">'
+    +'<select class="eType">'+ledTypeOptions(e.type)+'</select>'
+    +'<input type="number" step="0.01" min="0" class="eAmount" value="'+(e.amount/100)+'" title="金额（元）">'
+    +'<input type="text" class="eCat" value="'+esc(e.cat)+'" maxlength="20" title="分类">'
+    +'<select class="eAcct">'+ledAcctOptions(e.account)+'</select>'
+    +'<input type="date" class="eDate" value="'+esc(e.date)+'">'
+    +'<input type="text" class="eNote" value="'+esc(e.note)+'" maxlength="60" title="备注">'
+    +'<button class="primary sm" data-act="ledSaveEdit">保存</button>'
+    +'<button class="ghost sm" data-act="ledCancelEdit">取消</button>'
+    +'</div></div>';
+}
+function renderLedBudgets(){
+  var wrap=$("#ledBudgets");
+  var ym=ledMonthKey(ledCursor);
+  var spent=ledByCat(ym,"expense");
+  var names=Object.keys(spent);
+  state.ledger.cats.expense.forEach(function(c){if(names.indexOf(c)<0)names.push(c);});
+  names.sort();
+  if(!names.length){
+    wrap.innerHTML='<div class="empty sm">这个月还没有支出记录。在「分类与预算」里给分类设个上限，这里就会显示花到哪了。</div>';
+    return;
+  }
+  wrap.innerHTML=names.map(function(c){
+    var used=spent[c]||0;
+    var bud=ledBudget(c);
+    if(!bud){
+      return '<div class="bud"><div class="bt"><span class="nm">'+esc(c)+'</span>'
+        +'<span class="amt">已花 ¥'+fmtMoney(used)+' · 没设预算</span></div></div>';
+    }
+    var pct=Math.round(used/bud*100);
+    var over=used>bud;
+    return '<div class="bud'+(over?" over":"")+'"><div class="bt"><span class="nm">'+esc(c)+'</span>'
+      +(over?'<span class="chip chipd">超支</span>':"")
+      +'<span class="amt">'+fmtMoney(used)+' / '+fmtMoney(bud)+'（'+pct+'%）</span></div>'
+      +'<div class="bar"><i class="'+(over?"over":"")+'" style="width:'+Math.min(100,pct)+'%"></i></div></div>';
+  }).join("");
+}
+function renderLedger(){
+  var ym=ledMonthKey(ledCursor);
+  $("#ledMonth").textContent=ledCursor.getFullYear()+" 年 "+(ledCursor.getMonth()+1)+" 月";
+  var st=ledStats(ym);
+  $("#ledIn").textContent="¥"+fmtMoney(st.income);
+  $("#ledOut").textContent="¥"+fmtMoney(st.expense);
+  var bal=$("#ledBal");
+  bal.textContent="¥"+fmtMoney(st.balance);
+  bal.classList.toggle("neg",st.balance<0);
+  fillCatList();
+  buildAccountOptions();
+  var of=ledEntriesOf(ym);
+  var seq={};
+  of.forEach(function(e,i){seq[e.id]=i;});
+  var rows=of.slice().sort(function(a,b){
+    if(a.date!==b.date)return a.date<b.date?1:-1;
+    var c=String(b.createdAt||"").localeCompare(String(a.createdAt||""));
+    if(c)return c;
+    return (seq[b.id]||0)-(seq[a.id]||0);
+  });
+  $("#ledList").innerHTML=rows.length
+    ?rows.map(function(e){return e.id===ledEditingId?ledEditRow(e):ledRow(e);}).join("")
+    :'<div class="empty sm">这一个月还没有记账。在上面记一笔试试。</div>';
+  renderLedBudgets();
+}
+function addLedgerEntry(){
+  var amtEl=$("#ledAmount"),catEl=$("#ledCat");
+  var yuan=String(amtEl.value).trim();
+  if(!yuan){toast("先填金额");amtEl.focus();return;}
+  var num=Number(yuan);
+  if(!isFinite(num)||num<=0){toast("金额得大于 0");amtEl.focus();return;}
+  var cents=Math.round(num*100);
+  if(cents<=0){toast("金额太小了");amtEl.focus();return;}
+  var cat=catEl.value.trim();
+  if(!cat){toast("写个分类，没写过的会新建");catEl.focus();return;}
+  var type=($("#ledType").value==="income")?"income":"expense";
+  var ds=$("#ledDate").value||todayStr();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))ds=todayStr();
+  ensureCat(type,cat);
+  state.ledger.entries.push({id:uid(),type:type,amount:cents,cat:cat,
+    account:$("#ledAccount").value||"",note:$("#ledNote").value.trim(),
+    date:ds,createdAt:nowLocalSec()});
+  save();
+  amtEl.value="";catEl.value="";$("#ledNote").value="";
+  toast((type==="income"?"收入":"支出")+"已记下");
+  renderLedger();
+  if(!$("#ledSetModal").hidden)renderLedgerSettings();
+}
+function delLedgerEntry(id){
+  var e=ledFind(id);if(!e)return;
+  if(!confirm("删除这笔「"+e.cat+" "+fmtMoney(e.amount)+"」？"))return;
+  state.ledger.entries=state.ledger.entries.filter(function(x){return x.id!==id;});
+  ledEditingId=null;save();renderLedger();
+}
+function ledSaveEdit(row){
+  var e=ledFind(row.getAttribute("data-id"));if(!e)return;
+  var amountEl=row.querySelector(".eAmount");
+  var n=Number(amountEl.value);
+  if(!isFinite(n)||n<=0){toast("金额得大于 0");amountEl.focus();return;}
+  var catEl=row.querySelector(".eCat");
+  var cat=catEl.value.trim();
+  if(!cat){toast("分类不能空");catEl.focus();return;}
+  var ds=row.querySelector(".eDate").value||e.date;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))ds=e.date;
+  e.type=(row.querySelector(".eType").value==="income")?"income":"expense";
+  e.amount=Math.round(n*100);
+  e.cat=cat;
+  e.account=row.querySelector(".eAcct").value||"";
+  e.date=ds;
+  e.note=row.querySelector(".eNote").value.trim();
+  ensureCat(e.type,cat);
+  ledEditingId=null;
+  save();renderLedger();
+  toast("已更新");
+}
+function ledShift(n){
+  ledCursor=new Date(ledCursor.getFullYear(),ledCursor.getMonth()+n,1);
+  ledEditingId=null;
+  renderLedger();
+}
+function renderHomeLedger(){
+  var st=ledStats(ledMonthKey(new Date()));
+  $("#homeLedIn").textContent="¥"+fmtMoney(st.income);
+  $("#homeLedOut").textContent="¥"+fmtMoney(st.expense);
+  var b=$("#homeLedBal");
+  b.textContent="¥"+fmtMoney(st.balance);
+  b.classList.toggle("neg",st.balance<0);
+}
+
+/* ---- 分类 / 账户 / 预算 管理 ---- */
+function catTags(type,boxId){
+  var box=$("#"+boxId);
+  var arr=state.ledger.cats[type];
+  box.innerHTML=arr.length
+    ?arr.map(function(c){
+      return '<span class="cattag" data-cat="'+esc(c)+'" data-type="'+type+'"><span class="nm">'+esc(c)+'</span>'
+        +'<button data-act="catRename" title="改名">改名</button>'
+        +'<button data-act="catDel" title="删除">删</button></span>';
+    }).join("")
+    :'<span class="muted">还没有分类。第一次记账时现写一个，或在下面加。</span>';
+}
+function acctTags(){
+  var box=$("#acctList");
+  box.innerHTML=state.ledger.accounts.length
+    ?state.ledger.accounts.map(function(a){
+      return '<span class="cattag" data-acct="'+esc(a)+'"><span class="nm">'+esc(a)+'</span>'
+        +'<button data-act="acctRename" title="改名">改名</button>'
+        +'<button data-act="acctDel" title="删除">删</button></span>';
+    }).join("")
+    :'<span class="muted">还没有账户。用不到就别加，记账时本来就可以不填。</span>';
+}
+function budgetRows(){
+  var box=$("#budgetList");
+  var cats=state.ledger.cats.expense;
+  if(!cats.length){
+    box.innerHTML='<div class="muted">先加几个支出分类，这里就能给它们设每月上限。</div>';
+    return;
+  }
+  box.innerHTML=cats.map(function(c){
+    var b=ledBudget(c);
+    return '<div class="setrow" data-cat="'+esc(c)+'"><span class="nm">'+esc(c)+'</span>'
+      +'<input type="number" class="budInput" min="0" step="1" placeholder="不限" value="'+(b?(b/100):"")+'">'
+      +'<span class="muted">元 / 月</span></div>';
+  }).join("");
+}
+function renderLedgerSettings(){
+  catTags("expense","catExpense");
+  catTags("income","catIncome");
+  acctTags();
+  budgetRows();
+}
+function addCat(type,inputId){
+  var inp=$("#"+inputId);
+  var v=inp.value.trim();
+  if(!v){inp.focus();return;}
+  if(state.ledger.cats[type].indexOf(v)>=0){toast("这个分类已经有了");inp.value="";return;}
+  state.ledger.cats[type].push(v);
+  inp.value="";
+  save();renderLedgerSettings();renderLedger();
+  toast("分类已加");
+}
+function renameCat(type,oldName,newName){
+  newName=String(newName==null?"":newName).trim();
+  if(!newName||newName===oldName)return;
+  var arr=state.ledger.cats[type];
+  var i=arr.indexOf(oldName);
+  if(i<0)return;
+  if(arr.indexOf(newName)>=0){toast("已经有同名分类了");return;}
+  arr[i]=newName;
+  state.ledger.entries.forEach(function(e){if(e.type===type&&e.cat===oldName)e.cat=newName;});
+  if(type==="expense"&&typeof state.ledger.budgets[oldName]==="number"){
+    state.ledger.budgets[newName]=state.ledger.budgets[oldName];
+    delete state.ledger.budgets[oldName];
+  }
+  save();renderLedgerSettings();renderLedger();
+  toast("分类已改名，老记录也一起改了");
+}
+function delCat(type,name){
+  var used=state.ledger.entries.filter(function(e){return e.type===type&&e.cat===name;}).length;
+  var msg="删除分类「"+name+"」？";
+  if(used)msg+="\n\n已有的 "+used+" 笔记录会保留（仍显示「"+name+"」），只是以后记账时不再提示它。";
+  if(!confirm(msg))return;
+  state.ledger.cats[type]=state.ledger.cats[type].filter(function(c){return c!==name;});
+  if(type==="expense")delete state.ledger.budgets[name];
+  save();renderLedgerSettings();renderLedger();
+}
+function addAcct(){
+  var inp=$("#newAcct");
+  var v=inp.value.trim();
+  if(!v){inp.focus();return;}
+  if(state.ledger.accounts.indexOf(v)>=0){toast("这个账户已经有了");inp.value="";return;}
+  state.ledger.accounts.push(v);
+  inp.value="";
+  save();acctTags();buildAccountOptions();
+  toast("账户已加");
+}
+function renameAcct(oldName,newName){
+  newName=String(newName==null?"":newName).trim();
+  if(!newName||newName===oldName)return;
+  var i=state.ledger.accounts.indexOf(oldName);
+  if(i<0)return;
+  if(state.ledger.accounts.indexOf(newName)>=0){toast("已经有同名账户了");return;}
+  state.ledger.accounts[i]=newName;
+  state.ledger.entries.forEach(function(e){if(e.account===oldName)e.account=newName;});
+  save();acctTags();buildAccountOptions();renderLedger();
+  toast("账户已改名");
+}
+function delAcct(name){
+  if(!confirm("删除账户「"+name+"」？已有的记录会留着这个名字。"))return;
+  state.ledger.accounts=state.ledger.accounts.filter(function(a){return a!==name;});
+  save();acctTags();buildAccountOptions();renderLedger();
+}
+function setBudget(cat,val){
+  var yuan=String(val==null?"":val).trim();
+  var n=yuan?Number(yuan):0;
+  if(!yuan||!isFinite(n)||n<=0)delete state.ledger.budgets[cat];
+  else state.ledger.budgets[cat]=Math.round(n*100);
+  save();renderLedBudgets();
+}
+
 /* ================= 月视图 ================= */
 var mCursor=new Date();
 var dayOpenDate=null;
@@ -895,6 +1386,7 @@ function renderHome(){
   renderTodayList();
   renderHomeProjects();
   renderMonth();
+  renderHomeLedger();
 }
 
 /* ================= 提醒 ================= */
@@ -940,7 +1432,7 @@ function checkOnLoad(){
 
 /* ================= 导出 / 导入 ================= */
 function exportPayload(){
-  return JSON.stringify({app:"workbench",version:1,exportedAt:new Date().toISOString(),data:state},null,2);
+  return JSON.stringify({app:"workbench",version:2,exportedAt:new Date().toISOString(),data:state},null,2);
 }
 function doExport(){
   try{
@@ -963,15 +1455,16 @@ function importFromText(text,askConfirm){
   if(askConfirm&&!confirm("导入会用备份文件覆盖当前全部数据。\n\n确定继续吗？"))return{ok:false,err:"已取消"};
   state=s;
   editingTodoId=null;editingProjId=null;journalDate=todayStr();mCursor=new Date();dayOpenDate=null;
+  ledEditingId=null;ledCursor=new Date();
   save();applyTheme();buildProjectOptions();
-  $("#dayModal").hidden=true;$("#missedModal").hidden=true;
+  $("#dayModal").hidden=true;$("#missedModal").hidden=true;$("#ledSetModal").hidden=true;
   switchTab("home");
   return{ok:true};
 }
 
 /* ================= 页签 ================= */
 var activeTab="home";
-var RENDERERS={home:renderHome,todos:renderTodos,projects:renderProjects,notes:renderNotes,journal:renderJournal};
+var RENDERERS={home:renderHome,todos:renderTodos,projects:renderProjects,notes:renderNotes,journal:renderJournal,ledger:renderLedger};
 function renderTab(name){var fn=RENDERERS[name];if(fn)fn();}
 function switchTab(name){
   activeTab=name;
@@ -1102,6 +1595,60 @@ function bindEvents(){
     jumpJournal(r.getAttribute("data-date"));
   });
 
+  /* ---- 记账 ---- */
+  $("#btnLedAdd").addEventListener("click",addLedgerEntry);
+  $("#ledAmount").addEventListener("keydown",function(e){if(e.key==="Enter")addLedgerEntry();});
+  $("#ledCat").addEventListener("keydown",function(e){if(e.key==="Enter")addLedgerEntry();});
+  $("#ledNote").addEventListener("keydown",function(e){if(e.key==="Enter")addLedgerEntry();});
+  $("#ledType").addEventListener("change",fillCatList);
+  $("#ledPrev").addEventListener("click",function(){ledShift(-1);});
+  $("#ledNext").addEventListener("click",function(){ledShift(1);});
+  $("#ledThis").addEventListener("click",function(){ledCursor=new Date();ledEditingId=null;renderLedger();});
+  $("#btnLedGo").addEventListener("click",function(){switchTab("ledger");});
+  $("#btnLedSet").addEventListener("click",function(){renderLedgerSettings();$("#ledSetModal").hidden=false;});
+  $("#ledList").addEventListener("click",function(e){
+    var b=e.target.closest("[data-act]");if(!b)return;
+    var act=b.getAttribute("data-act");
+    var row=b.closest(".lrow");var id=row?row.getAttribute("data-id"):"";
+    if(act==="ledDel")delLedgerEntry(id);
+    else if(act==="ledEdit"){ledEditingId=id;renderLedger();}
+    else if(act==="ledCancelEdit"){ledEditingId=null;renderLedger();}
+    else if(act==="ledSaveEdit")ledSaveEdit(row);
+  });
+  function onCatTag(e){
+    var b=e.target.closest("[data-act]");if(!b)return;
+    var tag=b.closest(".cattag");if(!tag)return;
+    var type=tag.getAttribute("data-type"),name=tag.getAttribute("data-cat");
+    if(b.getAttribute("data-act")==="catDel")delCat(type,name);
+    else{
+      var nn=prompt("把分类「"+name+"」改成：",name);
+      if(nn!=null)renameCat(type,name,nn);
+    }
+  }
+  $("#catExpense").addEventListener("click",onCatTag);
+  $("#catIncome").addEventListener("click",onCatTag);
+  $("#acctList").addEventListener("click",function(e){
+    var b=e.target.closest("[data-act]");if(!b)return;
+    var tag=b.closest(".cattag");if(!tag)return;
+    var name=tag.getAttribute("data-acct");
+    if(b.getAttribute("data-act")==="acctDel")delAcct(name);
+    else{
+      var nn=prompt("把账户「"+name+"」改成：",name);
+      if(nn!=null)renameAcct(name,nn);
+    }
+  });
+  $("#btnCatExpense").addEventListener("click",function(){addCat("expense","newCatExpense");});
+  $("#btnCatIncome").addEventListener("click",function(){addCat("income","newCatIncome");});
+  $("#newCatExpense").addEventListener("keydown",function(e){if(e.key==="Enter")addCat("expense","newCatExpense");});
+  $("#newCatIncome").addEventListener("keydown",function(e){if(e.key==="Enter")addCat("income","newCatIncome");});
+  $("#btnAcct").addEventListener("click",addAcct);
+  $("#newAcct").addEventListener("keydown",function(e){if(e.key==="Enter")addAcct();});
+  $("#budgetList").addEventListener("change",function(e){
+    var inp=e.target.closest(".budInput");if(!inp)return;
+    var row=inp.closest(".setrow");if(!row)return;
+    setBudget(row.getAttribute("data-cat"),inp.value);
+  });
+
   $("#mPrev").addEventListener("click",function(){mCursor=new Date(mCursor.getFullYear(),mCursor.getMonth()-1,1);renderMonth();});
   $("#mNext").addEventListener("click",function(){mCursor=new Date(mCursor.getFullYear(),mCursor.getMonth()+1,1);renderMonth();});
   $("#mToday").addEventListener("click",function(){mCursor=new Date();renderMonth();});
@@ -1147,6 +1694,7 @@ function bindEvents(){
 function init(){
   applyTheme();
   buildProjectOptions();
+  $("#ledDate").value=todayStr();
   bindEvents();
   switchTab("home");
   if(!storageOK)$("#warnBar").hidden=false;
@@ -1166,7 +1714,15 @@ window.__wb={
   exportPayload:exportPayload,
   importFromText:importFromText,
   switchTab:switchTab,
-  nowLocal:nowLocal
+  nowLocal:nowLocal,
+  ledMonthKey:ledMonthKey,
+  ledStats:ledStats,
+  setLedMonth:function(ym){
+    var p=String(ym).split("-");
+    ledCursor=new Date(+p[0],+p[1]-1,1);
+    ledEditingId=null;
+    renderLedger();
+  }
 };
 })();
 </script>
